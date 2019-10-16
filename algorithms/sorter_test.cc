@@ -3,12 +3,6 @@
 
 #include "sorter.h"
 
-std::vector<int> asc_sorted{0, 1, 2, 2, 4, 5};
-std::vector<int> desc_sorted{5, 4, 3, 3, 1, 0};
-std::vector<int> shuffled{5, 2, 3, 3, 4, 1, 0};
-std::vector<int> empty{};
-std::vector<int> singleton{2};
-
 void print_vector(std::vector<int>& v) {
   for (int i: v) {
     std::cout << i << ' ';
@@ -30,7 +24,7 @@ void heap_test() {
   sorter.heap_sort(empty, Sorter::greater<int>);
   sorter.heap_sort(singleton, Sorter::greater<int>);
 
-  std::vector<int> expected{5, 4, 3, 3, 1, 0};
+  std::vector<int> expected{0, 1, 3, 3, 4, 5};
 
   print_vector(asc_sorted);
   print_vector(desc_sorted);

@@ -1,9 +1,11 @@
+#pragma once
 #include <vector>
 
 template<typename T, typename Cmp>
 class Heap {
   private:
   std::vector<T>& v;
+  long size;
   Cmp comparator;
 
   void heapify() {
@@ -17,6 +19,8 @@ class Heap {
     if (right == -1) {
       return left;
     }
+    const T& left_val = v[left];
+    const T& right_val = v[right];
     return comparator(v[left], v[right]) ? left : right;
   }
 
@@ -26,25 +30,30 @@ class Heap {
 
   long rightChildIndex(long i) const {
     long idx = 2 * i + 2;
-    return idx < v.size() ? idx : -1;
+    return idx < size ? idx : -1;
   }
-  
+
   long parent(long i) const {
     return (i % 2 == 1) ? i / 2 : i / 2 - 1;
   }
 
   bool isLeaf(long i) const {
-    return i > v.size() / 2 - 1;
+    return i > size / 2 - 1;
   }
 
   public:
-  Heap(std::vector<T>& in, Cmp cmp) : v(in), comparator(cmp) {
+  Heap(std::vector<T>& in, Cmp cmp) : v(in), comparator(cmp), size(in.size()) {
     heapify();
   };
 
-  void downheap(unsigned i) {
+  void downheap(long i) {
+    if (size == 1) {
+      return;
+    }
     do {
-      long higher_child = higherValueIndex(leftChildIndex(i), rightChildIndex(i));
+      long left = leftChildIndex(i);
+      long right = rightChildIndex(i);
+      long higher_child = higherValueIndex(left, right);
       if (comparator(v[higher_child], v[i])) {
         std::swap(v[higher_child], v[i]);
         i = higher_child;
@@ -54,4 +63,9 @@ class Heap {
     } while (!isLeaf(i));
   }
 
+  void decreaseSize() {
+      --size;
+  }
+
 };
+
