@@ -2,16 +2,16 @@
 #include <vector>
 
 /*
-  greater - min heap
-  less - max heap
+  greater - max heap
+  less - min heap
  */
-template<typename T, typename Cmp = std::less<T>>
+template<typename T, typename Cmp = std::greater<T>>
 class Heap {
 public:
   Heap(std::vector<T>& in, const Cmp& cmp = Cmp()) : v(in), comparator(cmp) {
     heapify();
   };
-
+  /* less - ascending, greater - descending */
   template<typename Type>
   static void HeapSort(std::vector<Type>& v, const Cmp& cmp = Cmp()) {
     Heap<T, Cmp> heap(v, cmp);
@@ -36,7 +36,7 @@ private:
     if (right == -1) {
       return left;
     }
-    return comparator(v[right], v[left]) ? left : right;
+    return comparator(v[left], v[right]) ? left : right;
   }
 
   long leftChildIndex(long i) const {
@@ -64,7 +64,7 @@ private:
       long left = leftChildIndex(i);
       long right = rightChildIndex(i, to);
       long higher_child = higherValueIndex(left, right);
-      if (comparator(v[i], v[higher_child])) {
+      if (comparator(v[higher_child], v[i])) {
         std::swap(v[higher_child], v[i]);
         i = higher_child;
       } else {

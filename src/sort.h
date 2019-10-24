@@ -16,7 +16,7 @@ public:
     HInsertionSort(begin, end, 1, cmp);
   }
 
-  template<typename T, typename Cmp = std::less<T>>
+  template<typename T, typename Cmp = std::greater<T>>
   static void HeapSort(std::vector<T>& v, const Cmp& cmp = Cmp()) {
     Heap<T, Cmp>::HeapSort(v, cmp);
   }

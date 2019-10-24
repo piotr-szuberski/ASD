@@ -41,7 +41,7 @@ TEST_F(SortTest, HeapSort) {
   Sort::HeapSort(asc);
   Sort::HeapSort(desc);
   Sort::HeapSort(shuffledA);
-  Sort::HeapSort(shuffledB, std::greater<int>());
+  Sort::HeapSort(shuffledB, std::less<int>());
   Sort::HeapSort(empty);
   Sort::HeapSort(singleton);
   verifyAll();
