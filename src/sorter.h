@@ -6,6 +6,7 @@
 
 class Sorter {
 public:
+  Sorter() = delete;
 
   template<
     typename Iter,
