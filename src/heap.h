@@ -5,11 +5,11 @@
   greater - min heap
   less - max heap
  */
-template<typename T, typename Cmp>
+template<typename T, typename Cmp = std::less<T>>
 class Heap {
   private:
   std::vector<T>& v;
-  Cmp comparator;
+  const Cmp& comparator;
 
   void heapify() {
     long begin = v.size() / 2 - 1;
@@ -25,7 +25,7 @@ class Heap {
     return comparator(v[right], v[left]) ? left : right;
   }
 
-  long leftChildIndex(long i, long to) const {
+  long leftChildIndex(long i) const {
     return 2 * i + 1;
   }
 
@@ -47,7 +47,7 @@ class Heap {
       return;
     }
     do {
-      long left = leftChildIndex(i, to);
+      long left = leftChildIndex(i);
       long right = rightChildIndex(i, to);
       long higher_child = higherValueIndex(left, right);
       if (comparator(v[i], v[higher_child])) {
@@ -60,13 +60,13 @@ class Heap {
   }
 
   public:
-  Heap(std::vector<T>& in, Cmp cmp) : v(in), comparator(cmp) {
+  Heap(std::vector<T>& in, const Cmp& cmp = Cmp()) : v(in), comparator(cmp) {
     heapify();
   };
 
-  template<typename Type, typename Compare>
-  static void heap_sort(std::vector<Type>& v, Compare compare) {
-    Heap<T, Cmp> heap(v, compare);
+  template<typename Type>
+  static void heap_sort(std::vector<Type>& v, const Cmp& cmp = Cmp()) {
+    Heap<T, Cmp> heap(v, cmp);
     for (long i = v.size() - 1; i > 0; --i) {
       std::swap(v[0], v[i]);
       heap.downheap(0, i);
