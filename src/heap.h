@@ -7,7 +7,21 @@
  */
 template<typename T, typename Cmp = std::less<T>>
 class Heap {
-  private:
+public:
+  Heap(std::vector<T>& in, const Cmp& cmp = Cmp()) : v(in), comparator(cmp) {
+    heapify();
+  };
+
+  template<typename Type>
+  static void HeapSort(std::vector<Type>& v, const Cmp& cmp = Cmp()) {
+    Heap<T, Cmp> heap(v, cmp);
+    for (long i = v.size() - 1; i > 0; --i) {
+      std::swap(v[0], v[i]);
+      heap.downheap(0, i);
+    }
+  }
+
+private:
   std::vector<T>& v;
   const Cmp& comparator;
 
@@ -59,17 +73,4 @@ class Heap {
     } while (!isLeaf(i, to));
   }
 
-  public:
-  Heap(std::vector<T>& in, const Cmp& cmp = Cmp()) : v(in), comparator(cmp) {
-    heapify();
-  };
-
-  template<typename Type>
-  static void heap_sort(std::vector<Type>& v, const Cmp& cmp = Cmp()) {
-    Heap<T, Cmp> heap(v, cmp);
-    for (long i = v.size() - 1; i > 0; --i) {
-      std::swap(v[0], v[i]);
-      heap.downheap(0, i);
-    }
-  }
 };

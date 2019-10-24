@@ -27,16 +27,13 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
 enable_testing()
 
-set(SRC_DIR ${CMAKE_SOURCE_DIR}/src)
+include_directories("./src")
 
 set(TEST_DIR ${CMAKE_SOURCE_DIR}/test)
 
-set(HEADERS ${SRC_DIR}/sorter.h ${SRC_DIR}/heap.h)
+set(TEST ${TEST_DIR}/sort_test.cpp)
 
-set(TEST ${TEST_DIR}/sorter_test.cpp)
+add_executable(sort_test ${TEST_DIR}/sort_test.cpp)
+target_link_libraries(sort_test PRIVATE gtest_main)
 
-#add_library(asd STATIC ${src})
-add_executable(sorter_test ${TEST} ${HEADERS} )
-target_link_libraries(sorter_test PRIVATE gtest_main)
-
-add_test(NAME sorter_test_test COMMAND sorter_test)
+add_test(NAME sorter COMMAND sorter_test)
