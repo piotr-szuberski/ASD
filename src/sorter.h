@@ -5,19 +5,11 @@
 #include "heap.h"
 
 class Sorter {
-  public:
+public:
 
-  template<typename T>
-  static bool less(const T& t1, const T& t2) {
-    return t1 < t2;
-  }
-
-  template<typename T>
-  static bool greater(const T& t1, const T& t2) {
-    return t1 > t2;
-  }
-
-  template<typename Iter, typename Cmp = std::less<typename std::iterator_traits<Iter>::value_type>>
+  template<
+    typename Iter,
+    typename Cmp = std::less<typename std::iterator_traits<Iter>::value_type>>
   static void insertion_sort(Iter begin, Iter end, const Cmp& cmp = Cmp()) {
     h_insertion_sort(begin, end, 1, cmp);
   }
@@ -27,7 +19,9 @@ class Sorter {
     Heap<T, Cmp>::heap_sort(v, cmp);
   }
 
-  template<typename Iter, typename Cmp = std::less<typename std::iterator_traits<Iter>::value_type>>
+  template<
+    typename Iter,
+    typename Cmp = std::less<typename std::iterator_traits<Iter>::value_type>>
   static void ciura_sort(Iter begin, Iter end, std::vector<long> gaps, const Cmp& cmp = Cmp()) {
   const std::vector<long> ciuras_gaps{701, 301, 132, 57, 23, 10, 4, 1};
     for (long gap : gaps) {
@@ -41,7 +35,7 @@ class Sorter {
   static void hibbard_sort(Iter begin, Iter end, std::vector<long> gaps, const Cmp& cmp = Cmp()) {
     long range = std::distance(begin, end);
     long gap = 2;
-    while (gap < range) {
+    while (gap << 1 < range) {
       gap = gap << 1;
     }
     for (long i = gap ; i > 1; i = i / 2 - 1) {
@@ -49,17 +43,7 @@ class Sorter {
     }
   }
 
-  static std::vector<long> hibbard_gaps(long n) {
-    std::vector<long> gaps{1};
-    long gap = 2;
-    do {
-      gaps.push_back(gap * 2 - 1);
-      gap *= 2;
-    } while (gap < n);
-    return gaps;
-  }
-
-  private:
+private:
   template<
     typename Iter,
     typename Cmp = std::less<typename std::iterator_traits<Iter>::value_type>>
