@@ -9,12 +9,12 @@ template<typename T, typename Cmp = std::greater<T>>
 class Heap {
 
 private:
-  std::vector<T>& v;
+  std::vector<T> v;
   const Cmp& comparator;
 
-  Heap(std::vector<T>& in, const Cmp& cmp = Cmp()) : v(in), comparator(cmp) {
-    heapify();
-  };
+  std::vector<T>& getV() {
+    return v;
+  }
 
   void heapify() {
     long begin = v.size() / 2 - 1;
@@ -64,15 +64,30 @@ private:
     } while (!isLeaf(i, to));
   }
 
+  void sort() {
+    for (long i = v.size() - 1; i > 0; --i) {
+      std::swap(v[0], v[i]);
+      downheap(0, i);
+    }
+  }
+
 public:
+
+  Heap(const Cmp& cmp = Cmp()): comparator(cmp) {};
+
+  Heap(const std::vector<T>& in, const Cmp& cmp = Cmp()): v(in), comparator(cmp) {
+    heapify();
+  };
+
+  Heap(std::vector<T>&& in, const Cmp& cmp = Cmp()): v(std::move(in)), comparator(cmp) {
+    heapify();
+  };
 
   /* less - descending, greater - ascending */
   static void HeapSort(std::vector<T>& v, const Cmp& cmp = Cmp()) {
-    Heap<T, Cmp> heap(v, cmp);
-    for (long i = v.size() - 1; i > 0; --i) {
-      std::swap(v[0], v[i]);
-      heap.downheap(0, i);
-    }
+    Heap<T, Cmp> heap(std::move(v), cmp);
+    heap.sort();
+    v = std::move(heap.getV());
   }
 
 };
