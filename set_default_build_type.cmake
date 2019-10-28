@@ -1,6 +1,5 @@
 function(SetDefaultBuildType defaultBuildType)
 
-
   # https://blog.kitware.com/cmake-and-the-default-build-type/`
   if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     message(STATUS "Setting build type to '${defaultBuildType}' as none was specified.")
