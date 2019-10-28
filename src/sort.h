@@ -61,7 +61,8 @@ public:
     typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>>
   static void MergeSort(Iter begin, Iter end, const Cmp& cmp = Cmp()) {
     long length = std::distance(begin, end);
-    if (length < 2) {
+    if (length < 6) {
+      InsertionSort(begin, end, cmp);
       return;
     }
     Iter mid = std::next(begin, length / 2);
