@@ -76,3 +76,23 @@ TEST_F(SortTest, ShellSort) {
   Sort::ShellSort(singleton.begin(), singleton.end());
   verifyAll();
 }
+
+TEST_F(SortTest, SelectionSort) {
+  Sort::SelectionSort(asc.begin(), asc.end());
+  Sort::SelectionSort(desc.begin(), desc.end());
+  Sort::SelectionSort(shuffledA.begin(), shuffledA.end());
+  Sort::SelectionSort(shuffledB.begin(), shuffledB.end(), std::less<int>());
+  Sort::SelectionSort(empty.begin(), empty.end());
+  Sort::SelectionSort(singleton.begin(), singleton.end());
+  verifyAll();
+}
+
+TEST_F(SortTest, MergeSort) {
+  Sort::MergeSort(asc.begin(), asc.end());
+  Sort::MergeSort(desc.begin(), desc.end());
+  Sort::MergeSort(shuffledA.begin(), shuffledA.end());
+  Sort::MergeSort(shuffledB.begin(), shuffledB.end(), std::less<int>());
+  Sort::MergeSort(empty.begin(), empty.end());
+  Sort::MergeSort(singleton.begin(), singleton.end());
+  verifyAll();
+}

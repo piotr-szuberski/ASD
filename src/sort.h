@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <functional>
+#include <algorithm>
 #include "heap.h"
 
 /** By deafault sorts ascending */
@@ -45,11 +46,33 @@ public:
     }
   }
 
-private:
   template<
     typename Iter,
     typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>>
-  static void HInsertionSort(Iter begin, Iter end, long h, const Cmp& cmp = Cmp()) {
+  static void SelectionSort(Iter begin, Iter end, const Cmp& cmp = Cmp()) {
+    for (Iter i = end - 1; std::distance(begin, i) > 0; --i) {
+      Iter selectedElem = std::min_element(begin, i + 1, cmp);
+      std::swap(*selectedElem, *i);
+    }
+  }
+
+ template<
+    typename Iter,
+    typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>>
+  static void MergeSort(Iter begin, Iter end, const Cmp& cmp = Cmp()) {
+    long length = std::distance(begin, end);
+    if (length < 2) {
+      return;
+    }
+    Iter mid = std::next(begin, length / 2);
+    MergeSort(begin, mid, cmp);
+    MergeSort(mid, end, cmp);
+    Merge(begin, mid, end, cmp);
+  }
+
+private:
+  template<typename Iter, typename Cmp>
+  static void HInsertionSort(Iter begin, Iter end, long h, const Cmp& cmp) {
     for (Iter i = begin + h; std::distance(i, end) > 0; ++i) {
       Iter j = i - h;
       typename Iter::value_type x = *i;
@@ -60,6 +83,38 @@ private:
       *(j + h) = x;
     }
   }
+
+  template<typename Iter, typename Cmp>
+  static void Merge(Iter begin, Iter mid, Iter end, const Cmp& cmp) {
+    using IterValueType = typename std::iterator_traits<Iter>::value_type;
+    std::vector<IterValueType> tmp(std::distance(begin, end));
+    Iter left = begin, right = mid, tmpIter = tmp.begin();
+    while (left != mid && right != end) {
+      if (cmp(*right, *left)) {
+        *tmpIter = std::move(*left);
+        ++left;
+      } else {
+        *tmpIter = std::move(*right);
+        ++right;
+      }
+      ++tmpIter;
+    }
+    while (left != mid) {
+      *tmpIter = std::move(*left);
+      ++left;
+      ++tmpIter++;
+    }
+    while (right != end) {
+      *tmpIter = std::move(*right);
+      ++right;
+      ++tmpIter++;
+    }
+    for (IterValueType& value : tmp) {
+      *begin = std::move(value);
+      ++begin;
+    }
+  }
+  
 
 };
 
