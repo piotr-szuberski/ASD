@@ -96,3 +96,19 @@ TEST_F(SortTest, MergeSort) {
   Sort::MergeSort(singleton.begin(), singleton.end());
   verifyAll();
 }
+
+TEST_F(SortTest, RadixSort) {
+  Sort::RadixSort(asc.begin(), asc.end(), 8);
+  EXPECT_EQ(asc, ascSorted);
+  
+  shuffledA = std::vector<int>{200, 421, 121, 0, 0, 1, 34, 4, 65, 5, 20, 30, 31, 299, 321};
+  Sort::RadixSort(shuffledA.begin(), shuffledA.end(), 422);
+  std::vector<int> shuffledASorted = {0, 0, 1, 4, 5, 20, 30, 31, 34, 65, 121, 200, 299, 321, 421};
+  EXPECT_EQ(shuffledA, shuffledASorted);
+
+  Sort::RadixSort(empty.begin(), empty.end(), 0);
+  EXPECT_EQ(empty, std::vector<int>());
+
+  Sort::RadixSort(singleton.begin(), singleton.end(), 4);
+  EXPECT_EQ(singleton, std::vector<int>{3});
+}

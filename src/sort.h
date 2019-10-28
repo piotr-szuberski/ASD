@@ -71,6 +71,32 @@ public:
     Merge(begin, mid, end, cmp);
   }
 
+ template<typename Iter>
+  static void CountSort(
+    Iter begin,
+    Iter end,
+    const typename std::iterator_traits<Iter>::value_type& m
+  ) {
+    using IterValueType = typename std::iterator_traits<Iter>::value_type;
+    long length = std::distance(begin, end);
+    std::vector<IterValueType> v(m);
+    for (Iter i = begin; i != end; ++i) {
+      v[*i] += 1;
+    }
+    for (size_t i = 1; i < v.size(); ++i) {
+      v[i] += v[i - 1];
+    }
+    std::vector<IterValueType> tmp(length);
+    for (Iter i = end - 1; i != begin - 1; --i) {
+      tmp[--v[*i]] = std::move(*i);
+    }
+    Iter k = begin;
+    for (size_t i = 0; i < tmp.size(); ++i) {
+      *k = std::move(tmp[i]);
+      ++k;
+    }
+  }
+
 private:
   template<typename Iter, typename Cmp>
   static void HInsertionSort(Iter begin, Iter end, long h, const Cmp& cmp) {
