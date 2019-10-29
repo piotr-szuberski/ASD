@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.16.0)
 
 project("ASD")
+set(VERSION "1.0.0")
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -25,7 +26,8 @@ else()
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
 endif()
 
-include_directories(${CMAKE_SOURCE_DIR}/src)
+message("Binary tree path: ${PROJECT_BINARY_DIR}")
+add_subdirectory(${CMAKE_SOURCE_DIR}/src)
 
 enable_testing()
 
