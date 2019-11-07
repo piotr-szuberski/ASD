@@ -26,9 +26,12 @@ else()
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
 endif()
 
-message("Binary tree path: ${PROJECT_BINARY_DIR}")
+include_directories(${CMAKE_SOURCE_DIR}/src)
+
 add_subdirectory(${CMAKE_SOURCE_DIR}/src)
 
 enable_testing()
+
+message("Binary tree path: ${PROJECT_BINARY_DIR}")
 
 add_subdirectory(test)

@@ -4,5 +4,3 @@
 
 # it will add compiler flags to the library, visible as constants, e.g LIB_VERSION=2
 #target_compile_definitions(<library_name> PUBLIC <SOME_NAME>=<VALUE>)
-
-include_directories(${CMAKE_SOURCE_DIR}/src)

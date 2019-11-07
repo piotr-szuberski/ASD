@@ -3,6 +3,8 @@
 #include <vector>
 #include <functional>
 #include <algorithm>
+#include <limits>
+#include <numeric>
 #include "heap.h"
 
 /** By deafault sorts ascending */
@@ -71,13 +73,8 @@ public:
     Merge(begin, mid, end, cmp);
   }
 
- template<typename Iter>
-  static void CountSort(
-    Iter begin,
-    Iter end,
-    const typename std::iterator_traits<Iter>::value_type& m
-  ) {
-    using IterValueType = typename std::iterator_traits<Iter>::value_type;
+ template<typename Iter, typename IterValueType = typename std::iterator_traits<Iter>::value_type>
+  static void CountSort(Iter begin, Iter end, const IterValueType& m) {
     long length = std::distance(begin, end);
     std::vector<IterValueType> v(m);
     for (Iter i = begin; i != end; ++i) {
@@ -96,6 +93,45 @@ public:
       ++k;
     }
   }
+
+static void LexicographicEqualWordsSort(std::vector<std::string>& v, long k) {
+  std::vector<int> alphabet(std::numeric_limits<std::string::value_type>::max());
+  std::vector<int> positions(v.size());
+  std::iota(positions.begin(), positions.end(), 0);
+  
+  for (long phase = k - 1; phase > 0; --phase) {
+    std::vector<int> tmp(v.size());
+    alphabet.assign(alphabet.size(), 0);
+    for (size_t i = 0; i < v.size(); ++i) {
+      alphabet[v[positions[i]][phase]] += 1;
+    }
+    for (size_t i = 1; i < alphabet.size(); ++i) {
+      alphabet[i] += alphabet[i - 1];
+    }
+    for (long j = positions.size() - 1; j > 0; --j) {
+      alphabet[v[positions[j]][phase]]--;
+      tmp[alphabet[v[positions[j]][phase]]] = alphabet[v[positions[j]][phase]];
+    }
+    positions = std::move(tmp);
+  }
+  std::vector<std::string> sorted(v.size());
+  for (size_t i = 0; i < v.size(); ++i) {
+    sorted[positions[i]] = std::move(v[positions[i]]);
+  }
+  v = std::move(sorted);
+}
+
+  // static void LexicographicSort(std::vector<std::string>& v) {
+  //   std::vector<std::vector<std::string>> currentSizes;
+  //   long alphabetSize = std::numeric_limits<char>::max();
+  //   std::vector<std::vector<std::string>> m(alphabetSize, std::vector<std::string>());
+  //   std::vector<size_t>  
+
+  //   std::for_each(v.begin(), v.end(), [] () {
+
+  //   })
+
+  // }
 
 private:
   template<typename Iter, typename Cmp>
@@ -141,6 +177,8 @@ private:
       ++begin;
     }
   }
+
+  static size_t longest_string();
 
 };
 
