@@ -99,7 +99,7 @@ static void LexicographicEqualWordsSort(std::vector<std::string>& v, long k) {
   std::vector<int> positions(v.size());
   std::iota(positions.begin(), positions.end(), 0);
   
-  for (long phase = k - 1; phase > 0; --phase) {
+  for (long phase = k - 1; phase >= 0; --phase) {
     std::vector<int> tmp(v.size());
     alphabet.assign(alphabet.size(), 0);
     for (size_t i = 0; i < v.size(); ++i) {
@@ -108,30 +108,17 @@ static void LexicographicEqualWordsSort(std::vector<std::string>& v, long k) {
     for (size_t i = 1; i < alphabet.size(); ++i) {
       alphabet[i] += alphabet[i - 1];
     }
-    for (long j = positions.size() - 1; j > 0; --j) {
-      alphabet[v[positions[j]][phase]]--;
-      tmp[alphabet[v[positions[j]][phase]]] = alphabet[v[positions[j]][phase]];
+    for (long i = positions.size() - 1; i >= 0; --i) {
+      tmp[--alphabet[v[positions[i]][phase]]] = positions[i];
     }
     positions = std::move(tmp);
   }
   std::vector<std::string> sorted(v.size());
   for (size_t i = 0; i < v.size(); ++i) {
-    sorted[positions[i]] = std::move(v[positions[i]]);
+    sorted[i] = std::move(v[positions[i]]);
   }
   v = std::move(sorted);
 }
-
-  // static void LexicographicSort(std::vector<std::string>& v) {
-  //   std::vector<std::vector<std::string>> currentSizes;
-  //   long alphabetSize = std::numeric_limits<char>::max();
-  //   std::vector<std::vector<std::string>> m(alphabetSize, std::vector<std::string>());
-  //   std::vector<size_t>  
-
-  //   std::for_each(v.begin(), v.end(), [] () {
-
-  //   })
-
-  // }
 
 private:
   template<typename Iter, typename Cmp>
