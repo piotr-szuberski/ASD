@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <limits>
 #include <numeric>
+#include <queue>
 #include "heap.h"
 
 /** By deafault sorts ascending */
@@ -94,8 +95,11 @@ public:
     }
   }
 
-static void LexicographicEqualWordsSort(std::vector<std::string>& v, long k) {
-  std::vector<int> alphabet(std::numeric_limits<std::string::value_type>::max());
+template<typename Word>
+static void LexicographicEqualWordsSort(std::vector<Word>& v, long k) {
+  long maxValue = getMaxFromWords(v);
+
+  std::vector<long> alphabet(maxValue + 1);
   std::vector<int> positions(v.size());
   std::iota(positions.begin(), positions.end(), 0);
   
@@ -113,9 +117,72 @@ static void LexicographicEqualWordsSort(std::vector<std::string>& v, long k) {
     }
     positions = std::move(tmp);
   }
-  std::vector<std::string> sorted(v.size());
+  std::vector<Word> sorted(v.size());
   for (size_t i = 0; i < v.size(); ++i) {
     sorted[i] = std::move(v[positions[i]]);
+  }
+  v = std::move(sorted);
+}
+
+template<typename Word>
+static void LexicographicSort(std::vector<Word>& v) {
+  long maxValue = getMaxFromWords(v);
+  // Get the size of the longest string
+  size_t maxLength = std::max_element(v.begin(), v.end(),
+      [] (const auto& lhs, const auto& rhs) {
+        return lhs.size() < rhs.size();
+      }
+  )->size();
+  // First: value, second: index
+  std::vector<std::vector<long>> indexes;
+  for (const auto& val : v) {
+    for (size_t i = 0; i < val.size(); ++i) {
+      std::vector<long> x{static_cast<long>(val[i]), static_cast<long>(i)};
+      indexes.emplace_back(std::move(x));
+    }
+  }
+  // Sort by values and indexes
+  Sort::LexicographicEqualWordsSort(indexes, 2);
+
+  // Create structure that tells what alphabet's values at which index are used
+  std::vector<std::vector<long>> alphabet(maxValue + 1);
+  std::vector<long> previous = std::vector{-1L, -1L};
+  for (const std::vector<long>& i: indexes) {
+    if (previous == static_cast<std::vector<long>>(i)) {
+      continue;
+    }
+    previous = static_cast<std::vector<long>>(i);
+    alphabet[i[1]].push_back(i[0]);
+  }
+  
+  // Vector of queues with index equal to word's length
+  std::vector<std::vector<long>> lengthsList(maxLength + 1);
+  for (size_t i = 0; i < v.size(); ++i) {
+    lengthsList[v.size()].push_back(static_cast<long>(i));
+  }
+
+  std::deque<long> a;
+  std::vector<std::queue<long>> Q(maxValue + 1);
+  for (size_t i = maxLength - 1; i >= 1; --i) {
+    std::vector<long>& currentLengths = lengthsList[i];
+    for (size_t j = currentLengths.size(); j >= 1; --j) {
+      a.push_front(currentLengths[j - 1]);
+    }
+    while (!a.empty()) {
+      Q[v[a.front()][i - 1]].push(a.front());
+      a.pop_front();
+    }
+    for (const long j: alphabet[i - 1]) {
+      while (!Q[j].empty()) {
+        a.push_back(Q[j].front());
+        Q[j].pop();
+      }
+    }
+  }
+  std::vector<Word> sorted(v.size());
+  for (size_t i = 0; i < v.size(); ++i) {
+    sorted[i] = std::move(v[a.front()]);
+    a.pop_front();
   }
   v = std::move(sorted);
 }
@@ -164,8 +231,15 @@ private:
       ++begin;
     }
   }
-
-  static size_t longest_string();
+  
+  template<typename Word>
+  static long getMaxFromWords(const std::vector<Word>& v) {
+    long maxValue = 0;
+    for (const Word& w: v) {
+      maxValue = std::max(static_cast<long>(*std::max_element(w.begin(), w.end())), maxValue);
+    }
+    return maxValue;
+  }
 
 };
 
