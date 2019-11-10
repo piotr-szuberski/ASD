@@ -97,6 +97,16 @@ TEST_F(SortTest, MergeSort) {
   verifyAll();
 }
 
+TEST_F(SortTest, QuickSort) {
+  Sort::QuickSort(asc.begin(), asc.end());
+  Sort::QuickSort(desc.begin(), desc.end());
+  Sort::QuickSort(shuffledA.begin(), shuffledA.end());
+  Sort::QuickSort(shuffledB.begin(), shuffledB.end(), std::less<int>());
+  Sort::QuickSort(empty.begin(), empty.end());
+  Sort::QuickSort(singleton.begin(), singleton.end());
+  verifyAll();
+}
+
 TEST_F(SortTest, CountSort) {
   Sort::CountSort(asc.begin(), asc.end(), 8);
   EXPECT_EQ(asc, ascSorted);

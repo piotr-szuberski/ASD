@@ -81,6 +81,30 @@ static void MergeSort(Iter begin, Iter end, const Cmp& cmp = Cmp()) {
 
 template<
   typename Iter,
+  typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>
+>
+static void QuickSort(Iter begin, Iter end, const Cmp& cmp = Cmp()) {
+  std::cout << "QS" << std::distance(begin, end) <<  '\n';
+  size_t range = std::distance(begin, end);
+  if (range < 4) {
+    InsertionSort(begin, end, cmp);
+    return;
+  }
+  Iter pivot = select(begin, end, cmp);
+
+  Iter mid = partition(begin, end, pivot, cmp);
+
+  if (std::distance(begin, mid) < std::distance(mid, end)) {
+    QuickSort(begin, mid, cmp);
+    QuickSort(mid, end, cmp);
+  } else {
+    QuickSort(mid, end, cmp);
+    QuickSort(begin, mid, cmp);
+  }
+}
+
+template<
+  typename Iter,
   typename IterValueType = typename std::iterator_traits<Iter>::value_type
 >
 static void CountSort(Iter begin, Iter end, const IterValueType& m) {
@@ -181,12 +205,12 @@ template<typename Iter, typename Cmp>
 static void HInsertionSort(Iter begin, Iter end, long h, const Cmp& cmp) {
   for (Iter i = begin + h; std::distance(i, end) > 0; ++i) {
     Iter j = i - h;
-    typename Iter::value_type x = *i;
+    typename std::iterator_traits<Iter>::value_type x = std::move(*i);
     while (std::distance(begin, j) >= 0 && cmp(*j, x)) {
-      *(j + h) = *j;
+      *(j + h) = std::move(*j);
       j -= h;
     }
-    *(j + h) = x;
+    *(j + h) = std::move(x);
   }
 }
 
@@ -219,6 +243,48 @@ static void Merge(Iter begin, Iter mid, Iter end, const Cmp& cmp) {
     *begin = std::move(value);
     ++begin;
   }
+}
+
+template<typename Iter, typename Cmp>
+static Iter select(Iter begin, Iter end, const Cmp& cmp) {
+  std::cout << "Select" << '\n';
+  Iter mid = std::next(begin, std::distance(begin, end) / 2);
+  std::vector<Iter> v{begin, mid, end - 1};
+  InsertionSort(v.begin(), v.end(), [&] (
+    const Iter& lhv,
+    const Iter& rhv
+  ) -> bool { return cmp(*lhv, *rhv); });
+  return v[1];
+}
+
+template<typename Iter, typename Cmp>
+static Iter partition(
+  Iter begin,
+  Iter end,
+  Iter pivot,
+  const Cmp& cmp
+) {
+  std::cout << "Partition" << '\n';
+  end--;
+  if (cmp(*begin, *pivot)) {
+    std::swap(*begin, *pivot);
+    pivot = begin;
+    begin++;
+  } else {
+    std::swap(*pivot, *end);
+    pivot = end;
+    end--;
+  }
+  while (std::distance(begin, end) > 0) {
+    if (cmp(*begin, *pivot)) {
+      begin++;
+    } else {
+      std::swap(*begin, *end);
+      end--;
+    }
+  }
+  *begin = std::move(*pivot);
+  return begin;
 }
 
 // Lexicographic helpers
