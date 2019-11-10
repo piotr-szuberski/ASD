@@ -122,8 +122,8 @@ TEST_F(SortTest, LexicographicEqualWordsSort) {
 }
 
 TEST_F(SortTest, LexicographicSort) {
-  std::vector<std::string> v{"1253", "12", "3122", "211", "4"};
-  std::vector<std::string> sorted{"12", "1253", "211", "3122", "4"};
+  std::vector<std::string> v{"1253", "12", "3122", "211", "", "", "4", "21"};
+  std::vector<std::string> sorted{"", "", "12", "1253", "21", "211", "3122", "4"};
 
   Sort::LexicographicSort(v);
   EXPECT_EQ(v, sorted);

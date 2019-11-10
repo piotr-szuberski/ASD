@@ -15,7 +15,8 @@ public:
 
   template<
     typename Iter,
-    typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>>
+    typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>
+  >
   static void InsertionSort(Iter begin, Iter end, const Cmp& cmp = Cmp()) {
     HInsertionSort(begin, end, 1, cmp);
   }
@@ -27,7 +28,8 @@ public:
 
   template<
     typename Iter,
-    typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>>
+    typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>
+  >
   static void CiuraSort(Iter begin, Iter end, const Cmp& cmp = Cmp()) {
   const std::vector<long> ciuras_gaps{701, 301, 132, 57, 23, 10, 4, 1};
     for (long gap : ciuras_gaps) {
@@ -37,7 +39,8 @@ public:
 
   template<
     typename Iter,
-    typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>>
+    typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>
+  >
   static void ShellSort(Iter begin, Iter end, const Cmp& cmp = Cmp()) {
     long range = std::distance(begin, end);
     long gap = 2;
@@ -51,7 +54,8 @@ public:
 
   template<
     typename Iter,
-    typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>>
+    typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>
+  >
   static void SelectionSort(Iter begin, Iter end, const Cmp& cmp = Cmp()) {
     for (Iter i = end - 1; std::distance(begin, i) > 0; --i) {
       Iter selectedElem = std::min_element(begin, i + 1, cmp);
@@ -61,7 +65,8 @@ public:
 
  template<
     typename Iter,
-    typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>>
+    typename Cmp = std::greater<typename std::iterator_traits<Iter>::value_type>
+  >
   static void MergeSort(Iter begin, Iter end, const Cmp& cmp = Cmp()) {
     long length = std::distance(begin, end);
     if (length < 6) {
@@ -74,7 +79,10 @@ public:
     Merge(begin, mid, end, cmp);
   }
 
- template<typename Iter, typename IterValueType = typename std::iterator_traits<Iter>::value_type>
+  template<
+    typename Iter,
+    typename IterValueType = typename std::iterator_traits<Iter>::value_type
+  >
   static void CountSort(Iter begin, Iter end, const IterValueType& m) {
     long length = std::distance(begin, end);
     std::vector<IterValueType> v(m);
@@ -97,7 +105,10 @@ public:
 
 template<typename Word>
 static void LexicographicEqualWordsSort(std::vector<Word>& v, long k) {
-  long maxValue = getMaxFromWords(v);
+  long maxValue = getWordsMaxValue(v);
+  if (maxValue == -1) {
+    return;
+  }
 
   std::vector<long> alphabet(maxValue + 1);
   std::vector<int> positions(v.size());
@@ -126,53 +137,31 @@ static void LexicographicEqualWordsSort(std::vector<Word>& v, long k) {
 
 template<typename Word>
 static void LexicographicSort(std::vector<Word>& v) {
-  long maxValue = getMaxFromWords(v);
-  // Get the size of the longest string
-  size_t maxLength = std::max_element(v.begin(), v.end(),
-      [] (const auto& lhs, const auto& rhs) {
-        return lhs.size() < rhs.size();
-      }
-  )->size();
-  // First: value, second: index
-  std::vector<std::vector<long>> indexes;
-  for (const auto& val : v) {
-    for (size_t i = 0; i < val.size(); ++i) {
-      std::vector<long> x{static_cast<long>(val[i]), static_cast<long>(i)};
-      indexes.emplace_back(std::move(x));
-    }
+  long maxValue = getWordsMaxValue(v);
+  if (maxValue == -1) {
+    return;
   }
-  // Sort by values and indexes
-  Sort::LexicographicEqualWordsSort(indexes, 2);
+  size_t maxLength = getSizeOfLongest(v);
 
-  // Create structure that tells what alphabet's values at which index are used
-  std::vector<std::vector<long>> alphabet(maxValue + 1);
-  std::vector<long> previous = std::vector{-1L, -1L};
-  for (const std::vector<long>& i: indexes) {
-    if (previous == static_cast<std::vector<long>>(i)) {
-      continue;
-    }
-    previous = static_cast<std::vector<long>>(i);
-    alphabet[i[1]].push_back(i[0]);
-  }
-  
-  // Vector of queues with index equal to word's length
-  std::vector<std::vector<long>> lengthsList(maxLength + 1);
-  for (size_t i = 0; i < v.size(); ++i) {
-    lengthsList[v.size()].push_back(static_cast<long>(i));
-  }
+  auto notEmptyValues = createNotEmptyValuesForIndexes(v, maxLength);
+
+  auto lengthsList = createLengthsList(v, maxLength);
 
   std::deque<long> a;
   std::vector<std::queue<long>> Q(maxValue + 1);
-  for (size_t i = maxLength - 1; i >= 1; --i) {
+  for (long long i = maxLength; i >= 0; --i) {
     std::vector<long>& currentLengths = lengthsList[i];
     for (size_t j = currentLengths.size(); j >= 1; --j) {
       a.push_front(currentLengths[j - 1]);
+    }
+    if (i == 0) {
+      break;
     }
     while (!a.empty()) {
       Q[v[a.front()][i - 1]].push(a.front());
       a.pop_front();
     }
-    for (const long j: alphabet[i - 1]) {
+    for (const long j: notEmptyValues[i - 1]) {
       while (!Q[j].empty()) {
         a.push_back(Q[j].front());
         Q[j].pop();
@@ -231,14 +220,70 @@ private:
       ++begin;
     }
   }
-  
+
+  // Lexicographic helpers
   template<typename Word>
-  static long getMaxFromWords(const std::vector<Word>& v) {
-    long maxValue = 0;
+  static long getWordsMaxValue(const std::vector<Word>& v) {
+    long maxValue = -1;
     for (const Word& w: v) {
-      maxValue = std::max(static_cast<long>(*std::max_element(w.begin(), w.end())), maxValue);
+      maxValue = std::max(
+        static_cast<long>(*std::max_element(w.begin(), w.end())),
+        maxValue
+      );
     }
     return maxValue;
+  }
+
+  template<typename Word>
+  static size_t getSizeOfLongest(const std::vector<Word>& v) {
+    return std::max_element(
+      v.begin(),
+      v.end(),
+      [] (const auto& lhs, const auto& rhs) {
+        return lhs.size() < rhs.size();
+      }
+    )->size();
+  }
+
+  // 0 - value, 1 - index
+  // The result is at which Words' index which values are used in sorted order
+  template<typename Word>
+  static std::vector<std::vector<long>> createNotEmptyValuesForIndexes(
+    const std::vector<Word>& v,
+    long maxLength
+  ) {
+    std::vector<std::vector<long>> indexes;
+    for (const Word& val : v) {
+      for (size_t i = 0; i < val.size(); ++i) {
+        std::vector<long> x{static_cast<long>(val[i]), static_cast<long>(i)};
+        indexes.emplace_back(std::move(x));
+      }
+    }
+    
+    Sort::LexicographicEqualWordsSort(indexes, 2);
+
+    std::vector<std::vector<long>> alphabet(maxLength);
+    std::vector<long> previous = std::vector{-1L, -1L};
+    for (const auto& i: indexes) {
+      if (previous == static_cast<std::vector<long>>(i)) {
+        continue;
+      }
+      previous = static_cast<std::vector<long>>(i);
+      alphabet[i[1]].push_back(i[0]);
+    }
+    return alphabet;
+  }
+
+  template<typename Word>
+  static std::vector<std::vector<long>> createLengthsList(
+    const std::vector<Word>& v,
+    long maxLength
+  ) {
+    std::vector<std::vector<long>> lengthsList(maxLength + 1);
+    for (size_t i = 0; i < v.size(); ++i) {
+      lengthsList[v[i].size()].push_back(static_cast<long>(i));
+    }
+    return lengthsList;
   }
 
 };
